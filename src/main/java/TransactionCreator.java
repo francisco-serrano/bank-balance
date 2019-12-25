@@ -1,51 +1,25 @@
-import com.google.gson.*;
-
-import java.lang.reflect.Type;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
-public class TransactionBuilder {
-    private class LocalDateTimeSerializer implements JsonSerializer<LocalDateTime> {
-        @Override
-        public JsonElement serialize(LocalDateTime localDateTime, Type type, JsonSerializationContext context) {
-            return new JsonPrimitive(localDateTime.toString());
-        }
-    }
-
-    private class LocalDateTimeDeserializer implements JsonDeserializer<LocalDateTime> {
-        @Override
-        public LocalDateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
-            return LocalDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString());
-        }
-    }
-
-    private class KafkaMessage {
-        public String customer;
-        public int amount;
-        public LocalDateTime time;
-    }
-
-    private Gson gson;
+public class TransactionCreator {
     private List<String> possibleCustomers = Arrays.asList("John", "Mike", "Eddie", "Michael", "Patrick", "Francis");
+    private Random random = new Random();
 
-
-    public TransactionBuilder() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
-
-        this.gson = gsonBuilder.create();
+    private String randomCustomer() {
+        return this.possibleCustomers.get(this.random.nextInt(this.possibleCustomers.size()));
     }
 
-    public KafkaMessage generateTransaction() {
-        KafkaMessage message = new KafkaMessage();
-        message.customer = "John";
-        message.amount = 123;
-        message.time = LocalDateTime.now();
+    private int randomAmount(int max) {
+        return this.random.nextInt(max);
+    }
 
-        System.out.println(this.gson.toJson(message));
+    public TransactionMessage generateTransaction() {
+        TransactionMessage message = new TransactionMessage();
+        message.customer = this.randomCustomer();
+        message.amount = this.randomAmount(1000);
+        message.time = LocalDateTime.now();
 
         return message;
     }

@@ -1,4 +1,7 @@
-package PACKAGE_NAME;
+import java.time.LocalDateTime;
 
-public class KafkaMessage {
+public class TransactionMessage {
+    public String customer;
+    public int amount;
+    public LocalDateTime time;
 }
