@@ -17,24 +17,10 @@ public class TransactionsProducer {
     private Gson gson;
     private TransactionCreator creator;
 
-    private static class LocalDateTimeSerializer implements JsonSerializer<LocalDateTime> {
-        @Override
-        public JsonElement serialize(LocalDateTime localDateTime, Type type, JsonSerializationContext context) {
-            return new JsonPrimitive(localDateTime.toString());
-        }
-    }
-
-    private static class LocalDateTimeDeserializer implements JsonDeserializer<LocalDateTime> {
-        @Override
-        public LocalDateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
-            return LocalDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString());
-        }
-    }
-
     public TransactionsProducer() {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
-        builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
+        builder.registerTypeAdapter(LocalDateTime.class, new TransactionMessage.LocalDateTimeSerializer());
+        builder.registerTypeAdapter(LocalDateTime.class, new TransactionMessage.LocalDateTimeDeserializer());
 
         this.gson = builder.create();
         this.creator = new TransactionCreator();
@@ -72,7 +58,7 @@ public class TransactionsProducer {
             logger.info("done!");
         }));
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             ProducerRecord<String, String> record = new ProducerRecord<>(
                     "bank.balance.transaction",
                     null,
