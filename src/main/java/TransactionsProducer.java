@@ -6,7 +6,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -59,10 +58,12 @@ public class TransactionsProducer {
         }));
 
         for (int i = 0; i < 1000000; i++) {
+            TransactionMessage tx = this.creator.generateTransaction();
+
             ProducerRecord<String, String> record = new ProducerRecord<>(
                     "bank.balance.transaction",
-                    null,
-                    this.gson.toJson(this.creator.generateTransaction())
+                    tx.customer,
+                    this.gson.toJson(tx)
             );
 
             producer.send(record, ((recordMetadata, e) -> {
